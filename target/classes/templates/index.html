@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Estoque</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+    }
+
+    .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Gestão de Estoque</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Produtos</a></li>
+          <li class="nav-item"><a class="nav-link" href="logs.html" id="verLogs">Logs</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="login.html">Sair</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Conteúdo -->
+  <div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3>Produtos</h3>
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAddProduto">
+        + Adicionar Produto
+      </button>
+    </div>
+
+    <!-- Cards de produtos -->
+    <div id="produtosContainer" class="row g-4">
+      
+    </div>
+  </div>
+
+  <!-- Adicionar Produto -->
+  <div class="modal fade" id="modalAddProduto" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formProduto">
+          <div class="modal-header">
+            <h5 class="modal-title">Adicionar Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Produto</label>
+              <input type="text" class="form-control" id="produtoNome" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Categoria</label>
+              <input type="text" class="form-control" id="produtoCategoria" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Fornecedor</label>
+              <input type="text" class="form-control" id="produtoFornecedor" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Valor (R$)</label>
+              <input type="number" step="0.01" class="form-control" id="produtoValor" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Quantidade</label>
+              <input type="number" class="form-control" id="produtoQuantidade" required>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editar Produto -->
+  <div class="modal fade" id="modalEditProduto" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="formEditProduto">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <input type="hidden" id="editProdutoIndex">
+
+            <div class="mb-3">
+              <label class="form-label">Produto</label>
+              <input type="text" class="form-control" id="editProdutoNome" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Categoria</label>
+              <input type="text" class="form-control" id="editProdutoCategoria" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Fornecedor</label>
+              <input type="text" class="form-control" id="editProdutoFornecedor" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Valor (R$)</label>
+              <input type="number" step="0.01" class="form-control" id="editProdutoValor" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Quantidade</label>
+              <input type="number" class="form-control" id="editProdutoQuantidade" required>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const produtos = [];
+    const produtosContainer = document.getElementById('produtosContainer');
+
+    // Renderiza os produtos na tela
+    function renderProdutos() {
+      produtosContainer.innerHTML = '';
+
+      if (produtos.length === 0) {
+        produtosContainer.innerHTML = '<p class="text-center text-muted">Nenhum produto cadastrado.</p>';
+        return;
+      }
+
+      produtos.forEach((p, index) => {
+        produtosContainer.innerHTML += `
+          <div class="col-md-4">
+            <div class="card p-3">
+              <div class="card-body">
+                <h5 class="card-title">${p.nome}</h5>
+                <p class="card-text">
+                  <strong>Categoria:</strong> ${p.categoria}<br>
+                  <strong>Fornecedor:</strong> ${p.fornecedor}<br>
+                  <strong>Valor:</strong> R$ ${p.valor.toFixed(2)}<br>
+                  <strong>Quantidade:</strong> ${p.quantidade}
+                </p>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-warning btn-sm" onclick="editarProduto(${index})">Editar</button>
+                  <button class="btn btn-danger btn-sm" onclick="removerProduto(${index})">Excluir</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Adicionar produto
+    document.getElementById('formProduto').addEventListener('submit', e => {
+      e.preventDefault();
+
+      const novoProduto = {
+        nome: document.getElementById('produtoNome').value,
+        categoria: document.getElementById('produtoCategoria').value,
+        fornecedor: document.getElementById('produtoFornecedor').value,
+        valor: parseFloat(document.getElementById('produtoValor').value),
+        quantidade: parseInt(document.getElementById('produtoQuantidade').value)
+      };
+
+      produtos.push(novoProduto);
+      renderProdutos();
+
+      // Fecha modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalAddProduto'));
+      modal.hide();
+      e.target.reset();
+    });
+
+    // Editar produto
+    function editarProduto(index) {
+      const produto = produtos[index];
+      if (!produto) return;
+
+      document.getElementById('editProdutoIndex').value = index;
+      document.getElementById('editProdutoNome').value = produto.nome;
+      document.getElementById('editProdutoCategoria').value = produto.categoria;
+      document.getElementById('editProdutoFornecedor').value = produto.fornecedor;
+      document.getElementById('editProdutoValor').value = produto.valor;
+      document.getElementById('editProdutoQuantidade').value = produto.quantidade;
+
+      const modal = new bootstrap.Modal(document.getElementById('modalEditProduto'));
+      modal.show();
+    }
+
+    // Salvar alterações de edição
+    document.getElementById('formEditProduto').addEventListener('submit', e => {
+      e.preventDefault();
+      const index = parseInt(document.getElementById('editProdutoIndex').value, 10);
+
+      produtos[index] = {
+        nome: document.getElementById('editProdutoNome').value,
+        categoria: document.getElementById('editProdutoCategoria').value,
+        fornecedor: document.getElementById('editProdutoFornecedor').value,
+        valor: parseFloat(document.getElementById('editProdutoValor').value),
+        quantidade: parseInt(document.getElementById('editProdutoQuantidade').value)
+      };
+
+      renderProdutos();
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditProduto'));
+      modal.hide();
+    });
+
+    // Remover produto
+    function removerProduto(index) {
+      const produto = produtos[index];
+      if (!produto) return;
+
+      if (confirm(`Deseja realmente excluir o produto "${produto.nome}"?`)) {
+        produtos.splice(index, 1);
+        renderProdutos();
+      }
+    }
+
+    renderProdutos();
+  </script>
+
+</body>
+</html>

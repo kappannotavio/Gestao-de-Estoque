@@ -1,0 +1,12 @@
+kappann\otavio\GestaoEstoque\controller\UsuarioController.class
+kappann\otavio\GestaoEstoque\repository\UsuarioRepository.class
+kappann\otavio\GestaoEstoque\model\Log.class
+kappann\otavio\GestaoEstoque\controller\LogController.class
+kappann\otavio\GestaoEstoque\repository\ProdutoRepository.class
+kappann\otavio\GestaoEstoque\service\LogService.class
+kappann\otavio\GestaoEstoque\repository\LogRepository.class
+kappann\otavio\GestaoEstoque\controller\ProdutoController.class
+kappann\otavio\GestaoEstoque\GestaoEstoqueApplication.class
+kappann\otavio\GestaoEstoque\controller\MiscController.class
+kappann\otavio\GestaoEstoque\model\Produto.class
+kappann\otavio\GestaoEstoque\model\Usuario.class
