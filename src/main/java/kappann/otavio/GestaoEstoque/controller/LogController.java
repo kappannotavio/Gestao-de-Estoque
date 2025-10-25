@@ -14,8 +14,8 @@ public class LogController {
     
     @Autowired
     private LogRepository logRepository;
-    
-    
+
+
     //Buscar Todos os Logs
     @GetMapping
     public List<Log> findALl() {return logRepository.findAll();}

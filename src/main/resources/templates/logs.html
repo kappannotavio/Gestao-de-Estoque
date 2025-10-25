@@ -36,9 +36,9 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="index.html">Produtos</a></li>
-          <li class="nav-item"><a class="nav-link active" href="logs.html">Logs</a></li>
-          <li class="nav-item"><a class="nav-link text-light" href="login.html">Sair</a></li>
+          <li class="nav-item"><a class="nav-link" href="index">Produtos</a></li>
+          <li class="nav-item"><a class="nav-link active" href="telaLogs">Logs</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="login">Sair</a></li>
         </ul>
       </div>
     </div>
@@ -53,40 +53,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Simulação de logs no frontend
-    // Você pode popular este array conforme ações do usuário
-    let logs = JSON.parse(localStorage.getItem("logs")) || [];
-
-    function renderLogs() {
-      const container = document.getElementById("logsContainer");
-      container.innerHTML = '';
-
-      if (logs.length === 0) {
-        container.innerHTML = '<p class="text-center text-muted">Nenhuma alteração registrada.</p>';
-        return;
-      }
-
-      logs.forEach(log => {
-        container.innerHTML += `
-          <div class="card mb-2 log-card">
-            <div class="card-body">
-              <p>${log.mensagem}</p>
-              <p class="timestamp">${log.data}</p>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    renderLogs();
-
-    function adicionarLog(mensagem) {
-      const data = new Date().toLocaleString();
-      logs.unshift({ mensagem, data });
-      localStorage.setItem("logs", JSON.stringify(logs));
-    }
-    
-  </script>
+  <script src="/Log.js"></script>
 </body>
 </html>
