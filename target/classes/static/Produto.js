@@ -89,14 +89,16 @@ async function removerProduto(id) {
 
 // -------------------- EDITAR PRODUTO --------------------
 function abrirEditar(produto) {
+  // produto deve ser o objeto vindo da sua lista (com .id, .nome, .categoria, .fornecedor, .valor, .quantidade)
   document.getElementById("editProdutoId").value = produto.id;
-  document.getElementById("editProdutoNome").value = produto.nome;
-  document.getElementById("editProdutoCategoria").value = produto.categoria;
-  document.getElementById("editProdutoFornecedor").value = produto.fornecedor;
-  document.getElementById("editProdutoValor").value = produto.valor;
-  document.getElementById("editProdutoQuantidade").value = produto.quantidade;
+  document.getElementById("editProdutoNome").value = produto.nome ?? "";
+  document.getElementById("editProdutoCategoria").value = produto.categoria ?? "";
+  document.getElementById("editProdutoFornecedor").value = produto.fornecedor ?? "";
+  document.getElementById("editProdutoValor").value = produto.valor ?? "";
+  document.getElementById("editProdutoQuantidade").value = produto.quantidade ?? "";
 
-  const modal = new bootstrap.Modal(document.getElementById("modalEditProduto"));
+  const modalEl = document.getElementById("modalEditProduto");
+  const modal = new bootstrap.Modal(modalEl);
   modal.show();
 }
 
@@ -104,12 +106,21 @@ async function salvarEdicao(event) {
   event.preventDefault();
 
   const id = document.getElementById("editProdutoId").value;
+  // validação simples
+  if (!id) {
+    alert("ID do produto não encontrado.");
+    return;
+  }
+
+  const valorRaw = document.getElementById("editProdutoValor").value;
+  const quantRaw = document.getElementById("editProdutoQuantidade").value;
+
   const produtoAtualizado = {
     nome: document.getElementById("editProdutoNome").value,
     categoria: document.getElementById("editProdutoCategoria").value,
     fornecedor: document.getElementById("editProdutoFornecedor").value,
-    valor: parseFloat(document.getElementById("editProdutoValor").value),
-    quantidade: parseInt(document.getElementById("editProdutoQuantidade").value)
+    valor: parseFloat(valorRaw.replace(",", ".")) || 0,
+    quantidade: parseInt(quantRaw, 10) || 0
   };
 
   try {
@@ -119,15 +130,27 @@ async function salvarEdicao(event) {
       body: JSON.stringify(produtoAtualizado)
     });
 
-    if (!response.ok) throw new Error("Erro ao atualizar produto");
+    if (!response.ok) {
+      // tenta ler mensagem de erro do servidor, se existir
+      let msg = `Erro ao atualizar produto. Status: ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json && json.message) msg += ` - ${json.message}`;
+      } catch (e) { /* ignorar */ }
+      throw new Error(msg);
+    }
 
-    carregarProdutos();
-    const modal = bootstrap.Modal.getInstance(document.getElementById("modalEditProduto"));
-    modal.hide();
+    // Recarrega a lista (certifique-se que carregarProdutos está definida)
+    if (typeof carregarProdutos === "function") carregarProdutos();
+
+    const modalEl = document.getElementById("modalEditProduto");
+    const modalInstance = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
+    modalInstance.hide();
+
     alert("Produto atualizado com sucesso!");
   } catch (erro) {
     console.error(erro);
-    alert("Erro ao atualizar produto.");
+    alert("Erro ao atualizar produto. Veja o console para mais detalhes.");
   }
 }
 
